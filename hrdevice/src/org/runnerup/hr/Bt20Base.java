@@ -80,6 +80,8 @@ public abstract class Bt20Base extends BtHRBase {
     private ConnectedThread connectedThread;
 
     private int hrValue = 0;
+    private int hrValueLast = 0;
+    private double smoothFactor = 0.35;
     private long hrTimestamp = 0;
     private BluetoothAdapter btAdapter = null;
 
@@ -486,7 +488,12 @@ public abstract class Bt20Base extends BtHRBase {
                     bytesInBuffer += bytesRead;
                     int bytesUsed = parseBuffer(buffer, bytesInBuffer, hr);
                     if (hr[0] != null) {
-                        hrValue = hr[0];
+                        hrValueLast = hrValue;
+                        if(hrValueLast != 0) {
+                            hrValue = (int) (smoothFactor * hr[0] + (1 - smoothFactor) * hrValueLast);
+                        } else {
+                            hrValue = hr[0];
+                        }
                         hrTimestamp = System.currentTimeMillis();
 
                         if (hrValue > 0 && mIsConnecting) {
