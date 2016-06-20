@@ -9,8 +9,8 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
 import org.runnerup.R;
-import org.runnerup.tracker.GpsInformation;
 import org.runnerup.common.util.Constants;
+import org.runnerup.tracker.GpsInformation;
 import org.runnerup.view.MainLayout;
 
 @TargetApi(Build.VERSION_CODES.FROYO)
@@ -31,7 +31,7 @@ public class GpsSearchingState implements NotificationState {
 
         builder.setContentIntent(pi);
         builder.setContentTitle(context.getString(R.string.Searching_for_GPS));
-        builder.setSmallIcon(R.drawable.icon);
+        builder.setSmallIcon(R.drawable.icon_notification);
         builder.setOnlyAlertOnce(true);
         org.runnerup.util.NotificationCompat.setLocalOnly(builder);
         org.runnerup.util.NotificationCompat.setVisibility(builder);

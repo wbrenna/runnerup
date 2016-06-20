@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 
 import org.runnerup.R;
@@ -59,6 +60,13 @@ public class SettingsActivity extends PreferenceActivity {
             btn.setOnPreferenceClickListener(onPruneClick);
         }
 
+        //remove google play notices from froyo since we do not use it
+        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.FROYO) {
+            Preference pref = findPreference("googleplayserviceslegalnotices");
+            PreferenceCategory category = (PreferenceCategory)findPreference("aboutcategory");
+            category.removePreference(pref);
+        }
+
         if (!hasHR(this)) {
             Preference pref = findPreference("cue_configure_hrzones");
             getPreferenceScreen().removePreference(pref);
@@ -76,11 +84,6 @@ public class SettingsActivity extends PreferenceActivity {
         return false;
     }
 
-    private String getDbFile() {
-        String from = getFilesDir().getPath() + "/../databases/runnerup.db";
-        return from;
-    }
-
     final OnPreferenceClickListener onExportClick = new OnPreferenceClickListener() {
 
         @Override
@@ -95,7 +98,7 @@ public class SettingsActivity extends PreferenceActivity {
                 }
 
             };
-            String from = getDbFile();
+            String from = DBHelper.getDbPath(getApplicationContext());
             String to = dstdir + "/runnerup.db.export";
             try {
                 int cnt = FileUtil.copyFile(to, from);
@@ -114,27 +117,9 @@ public class SettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             String srcdir = Environment.getExternalStorageDirectory().getPath();
-            builder.setTitle("Import runnerup.db from " + srcdir);
-            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-
-            };
-            String to = getDbFile();
             String from = srcdir + "/runnerup.db.export";
-            try {
-                int cnt = FileUtil.copyFile(to, from);
-                builder.setMessage("Copied " + cnt + " bytes");
-                builder.setPositiveButton(getString(R.string.Great), listener);
-            } catch (IOException e) {
-                builder.setMessage("Exception: " + e.toString());
-                builder.setNegativeButton(getString(R.string.Darn), listener);
-            }
-            builder.show();
+            DBHelper.importDatabase(SettingsActivity.this, from);
             return false;
         }
     };

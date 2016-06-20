@@ -12,8 +12,8 @@ import org.runnerup.R;
 import org.runnerup.common.util.Constants;
 import org.runnerup.util.Formatter;
 import org.runnerup.view.RunActivity;
-import org.runnerup.workout.WorkoutInfo;
 import org.runnerup.workout.Scope;
+import org.runnerup.workout.WorkoutInfo;
 
 @TargetApi(Build.VERSION_CODES.FROYO)
 public class OngoingState implements NotificationState {
@@ -36,7 +36,7 @@ public class OngoingState implements NotificationState {
         builder.setTicker(context.getString(R.string.RunnerUp_activity_started));
         builder.setContentIntent(pi);
         builder.setContentTitle(context.getString(R.string.Activity_ongoing));
-        builder.setSmallIcon(R.drawable.icon);
+        builder.setSmallIcon(R.drawable.icon_notification);
         builder.setOngoing(true);
         builder.setOnlyAlertOnce(true);
         org.runnerup.util.NotificationCompat.setLocalOnly(builder);

@@ -134,6 +134,7 @@
                         android:gravity="top|left"
                         android:inputType="textCapSentences|textMultiLine"
                         android:minLines="4"
+                        android:hint="@string/Notes_about_your_workout"
                         android:singleLine="false" />
 
                     <LinearLayout
@@ -187,17 +188,11 @@
                     android:weightSum="1">
                 </LinearLayout>
 
-                <LinearLayout
+                <include
                     android:id="@+id/tab_map"
+                    layout="@layout/map_area"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
-
-                    <fragment
-                        android:id="@+id/map"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        class="com.google.android.gms.maps.SupportMapFragment" />
-                </LinearLayout>
+                    android:layout_height="match_parent"/>
             </FrameLayout>
         </LinearLayout>
     </TabHost>
