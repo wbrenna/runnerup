@@ -345,16 +345,15 @@ public class ManageWorkoutsActivity extends Activity implements Constants {
             /**
              * Accounts/reports
              */
-            String sql = new String(
-                    "SELECT DISTINCT "
-                            + "  acc._id, " // 0
-                            + ("  acc." + DB.ACCOUNT.NAME + ", ")
-                            + ("  acc." + DB.ACCOUNT.DESCRIPTION + ", ")
-                            + ("  acc." + DB.ACCOUNT.AUTH_METHOD + ", ")
-                            + ("  acc." + DB.ACCOUNT.AUTH_CONFIG + ", ")
-                            + ("  acc." + DB.ACCOUNT.ENABLED + ", ")
-                            + ("  acc." + DB.ACCOUNT.FLAGS + " ")
-                            + (" FROM " + DB.ACCOUNT.TABLE + " acc "));
+            String sql = "SELECT DISTINCT "
+                    + "  acc._id, " // 0
+                    + ("  acc." + DB.ACCOUNT.NAME + ", ")
+                    + ("  acc." + DB.ACCOUNT.DESCRIPTION + ", ")
+                    + ("  acc." + DB.ACCOUNT.AUTH_METHOD + ", ")
+                    + ("  acc." + DB.ACCOUNT.AUTH_CONFIG + ", ")
+                    + ("  acc." + DB.ACCOUNT.ENABLED + ", ")
+                    + ("  acc." + DB.ACCOUNT.FLAGS + " ")
+                    + (" FROM " + DB.ACCOUNT.TABLE + " acc ");
 
             Cursor c = mDB.rawQuery(sql, null);
             allSynchronizers = DBHelper.toArray(c);
@@ -540,6 +539,7 @@ public class ManageWorkoutsActivity extends Activity implements Constants {
 
     private void deleteWorkout(WorkoutRef selected) {
         File f = WorkoutSerializer.getFile(this, selected.workoutName);
+        //noinspection ResultOfMethodCallIgnored
         f.delete();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         if (selected.workoutName.contentEquals(pref.getString(getResources().getString(R.string.pref_advanced_workout), ""))) {

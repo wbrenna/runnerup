@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
   <string-array name="unitEntries">
-    <item>Miles</item>
-    <item>Kilometer</item>
+    <item>Mérföld</item>
+    <item>Kilométer</item>
   </string-array>
   <string-array name="unitValues">
     <item>mi</item>
@@ -10,41 +10,53 @@
   </string-array>
   <!--Note: keep in same order as DB.INTENSITY-->
   <string-array name="step_intensity_types">
-    <item>Uppvärmning</item>
-    <item>Aktiv</item>
-    <item>Vila</item>
-    <item>Återhämtning</item>
-    <item>Nedvarvning</item>
+    <item>Bemelegítés</item>
+    <item>Aktív</item>
+    <item>Pihenés</item>
+    <item>Felépülés</item>
+    <item>Levezetés</item>
   </string-array>
   <!--same order as above, same values as Intensity-->
   <string-array name="duration_types">
-    <item>Till knapptryckning</item>
-    <item>Tid</item>
-    <item>Distans</item>
+    <item>Megnyomásig</item>
+    <item>Idő</item>
+    <item>Távolság</item>
   </string-array>
   <!--same order as above, same values as Dimension-->
   <string-array name="target_types">
-    <item>Ingen</item>
-    <item>Tempo</item>
-    <item>Pulszon</item>
+    <item>Nincs</item>
+    <item>Tempó</item>
+    <item>Pulzus zóna</item>
   </string-array>
   <!--Note: same order as above, same values as Dimension-->
   <!--Note: keep in same order as DB.ACCOUNT.SPORT_-->
+  <string-array name="sportEntries">
+    <item>Futás</item>
+    <item>Kerékpározás</item>
+    <item>Egyéb</item>
+  </string-array>
+  <string-array name="sportEntriesExperimental">
+    <item>Futás</item>
+    <item>Kerékpározás</item>
+    <item>Egyév</item>
+    <item>Tájfutás</item>
+    <item>Gyaloglás</item>
+  </string-array>
   <string-array name="muteEntries">
-    <item>Nej</item>
-    <item>Ja</item>
+    <item>Nem</item>
+    <item>Igen</item>
   </string-array>
   <string-array name="muteValues">
-    <item>nej</item>
-    <item>ja</item>
+    <item>nem</item>
+    <item>igen</item>
   </string-array>
   <string-array name="types">
-    <item>Tid</item>
-    <item>Distans</item>
+    <item>Idő</item>
+    <item>Távolság</item>
   </string-array>
   <string-array name="sexes">
-    <item>Man</item>
-    <item>Kvinna</item>
+    <item>Férfi</item>
+    <item>Nő</item>
   </string-array>
   <!--Audio cue languages-->
   <!--Note: keep in same order as languagesNames-->

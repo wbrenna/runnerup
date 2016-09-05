@@ -28,7 +28,9 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="false"
         android:layout_alignParentStart="false"
-        android:layout_above="@+id/button_table">
+        android:layout_above="@+id/button_table"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentLeft="false">
     </ExpandableListView>
 
   <TableLayout
@@ -50,17 +52,17 @@
           android:layout_height="wrap_content"
           android:text="@string/Download"
           android:textSize="16sp"
-  />
+      />
 
       <Button
-              android:id="@+id/share_workout_button"
-              style="@style/ButtonText"
-              android:background="@drawable/btn_blue"
-              android:layout_width="0dp"
-              android:layout_weight="1"
-              android:layout_height="wrap_content"
-              android:text="@string/Share"
-              android:textSize="16sp"
+          android:id="@+id/share_workout_button"
+          style="@style/ButtonText"
+          android:background="@drawable/btn_blue"
+          android:layout_width="0dp"
+          android:layout_weight="1"
+          android:layout_height="wrap_content"
+          android:text="@string/Share"
+          android:textSize="16sp"
       />
     </TableRow>
 

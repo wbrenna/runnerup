@@ -46,9 +46,9 @@ public class AutoPauseTrigger extends Trigger {
     private void HandleAutoPause(Workout workout) {
         Location lastLocation = workout.getLastKnownLocation();
         Double currentSpeed = workout.getSpeed(Scope.CURRENT);
-        if (currentSpeed == null)
-            return;
-        if (currentSpeed < mAutoPauseMinSpeed) {
+        //if (currentSpeed == null)
+        //    return;
+        if (currentSpeed < mAutoPauseMinSpeed && lastLocation != null) {
             if (!mIsAutoPaused && mHasStopped
                     && (lastLocation.getTime() - mStoppedMovingAt) > mAutoPauseAfterSeconds * 1000) {
                 mIsAutoPaused = true;

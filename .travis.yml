@@ -1,14 +1,23 @@
 language: android
 
+jdk:
+  - oraclejdk8
+
 android:
     components:
-        - build-tools-22.0.1
-        - android-21
-        - extras
+        - tools #latest for "builtin" sdk
+        - tools #latest
+        - platform-tools #latest
+        - build-tools-24.0.1
+        - android-24
         - extra-android-m2repository
+        - extra-google-m2repository
         - extra-google-google_play_services
 
+notifications:
+  email: false
+
 script:
-    - ./gradlew assembleFroyoRelease
-    - ./gradlew assembleLatestRelease
+    - ./gradlew lintFroyoRelease  assembleFroyoRelease
+    - ./gradlew lintLatestRelease assembleLatestRelease
     - ./gradlew test

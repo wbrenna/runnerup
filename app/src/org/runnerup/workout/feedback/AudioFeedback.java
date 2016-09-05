@@ -19,7 +19,6 @@ package org.runnerup.workout.feedback;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
 
@@ -101,7 +100,6 @@ public class AudioFeedback extends Feedback {
 
     protected String getCue(Workout w, Context ctx) {
         String msg = null;
-        Resources res = ctx.getResources();
         if (msgId != 0) {
             if (msgTxt == null) {
                 msgTxt = formatter.getCueString(msgId);

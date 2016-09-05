@@ -48,6 +48,7 @@ public abstract class Bt20Base extends BtHRBase {
     }
 
     public static boolean isEnabledImpl() {
+        //noinspection SimplifiableIfStatement
         if (BluetoothAdapter.getDefaultAdapter() != null)
             return BluetoothAdapter.getDefaultAdapter().isEnabled();
         return false;
@@ -57,16 +58,18 @@ public abstract class Bt20Base extends BtHRBase {
         return startEnableIntentImpl(activity, requestCode);
     }
 
+    @SuppressWarnings("SameReturnValue")
     public static boolean startEnableIntentImpl(Activity activity, int requestCode) {
         activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
                 requestCode);
         return true;
     }
 
-    public static boolean checkLibrary(Context ctx) {
+    public static boolean checkLibrary(@SuppressWarnings("UnusedParameters") Context ctx) {
 
         // Don't bother if createInsecureRfcommSocketToServiceRecord isn't
         // available
+        //noinspection RedundantIfStatement
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD_MR1)
             return false;
 
@@ -74,7 +77,7 @@ public abstract class Bt20Base extends BtHRBase {
     }
 
     // UUID
-    public static final UUID MY_UUID = UUID
+    private static final UUID MY_UUID = UUID
             .fromString("00001101-0000-1000-8000-00805F9B34FB");
     private ConnectThread connectThread;
     private ConnectedThread connectedThread;
@@ -87,7 +90,7 @@ public abstract class Bt20Base extends BtHRBase {
 
     // private Context context = null;
 
-    public Bt20Base(Context ctx) {
+    public Bt20Base(@SuppressWarnings("UnusedParameters") Context ctx) {
         // context = ctx;
     }
 
@@ -271,7 +274,7 @@ public abstract class Bt20Base extends BtHRBase {
         }
     }
 
-    protected static void closeSocket(BluetoothSocket bluetoothSocket) {
+    private static void closeSocket(BluetoothSocket bluetoothSocket) {
         if (bluetoothSocket != null) {
             try {
                 bluetoothSocket.close();
@@ -282,7 +285,7 @@ public abstract class Bt20Base extends BtHRBase {
 
     }
 
-    protected static void closeStream(InputStream stream) {
+    private static void closeStream(InputStream stream) {
         if (stream != null) {
             try {
                 stream.close();
@@ -317,7 +320,7 @@ public abstract class Bt20Base extends BtHRBase {
         }
     }
 
-    static BluetoothSocket tryConnect(BtHRBase base, final BluetoothDevice device, int i)
+    private static BluetoothSocket tryConnect(BtHRBase base, final BluetoothDevice device, int i)
             throws IOException {
         BluetoothSocket sock = null;
         base.log("tryConnect(method: " + i + ")");
@@ -332,19 +335,14 @@ public abstract class Bt20Base extends BtHRBase {
             case 2: {
                 Method m;
                 try {
+                    //noinspection RedundantArrayCreation
                     m = device.getClass().getMethod("createInsecureRfcommSocket",
-                            new Class[] {
-                                int.class
+                            new Class[]{
+                                    int.class
                             });
                     m.setAccessible(true);
                     sock = (BluetoothSocket) m.invoke(device, 1);
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
+                } catch (NoSuchMethodException | IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
@@ -441,16 +439,16 @@ public abstract class Bt20Base extends BtHRBase {
      * This thread handles data transmission when connected.
      */
     private class ConnectedThread extends Thread {
-        private final BluetoothDevice bluetoothDevice;
+        //private final BluetoothDevice bluetoothDevice;
         private final BluetoothSocket bluetoothSocket;
         private final InputStream inputStream;
-        private final String deviceName;
+        //private final String deviceName;
 
         public ConnectedThread(final BluetoothDevice device, final String deviceName,
                 final BluetoothSocket bluetoothSocket) {
-            this.bluetoothDevice = device;
+            //this.bluetoothDevice = device;
             this.bluetoothSocket = bluetoothSocket;
-            this.deviceName = deviceName;
+            //this.deviceName = deviceName;
 
             InputStream tmp = null;
 
@@ -545,7 +543,7 @@ public abstract class Bt20Base extends BtHRBase {
         }
     }
 
-    public void reportDisconnected(final boolean ok) {
+    private void reportDisconnected(@SuppressWarnings("SameParameterValue") final boolean ok) {
         log("reportDisconnect(" + ok + ")");
         if (hrClientHandler != null) {
             hrClientHandler.post(new Runnable() {
@@ -664,7 +662,7 @@ public abstract class Bt20Base extends BtHRBase {
             return -1;
         }
 
-        private static int calcCrc8(byte buffer[], int start, int length) {
+        private static int calcCrc8(byte buffer[], @SuppressWarnings("SameParameterValue") int start, @SuppressWarnings("SameParameterValue") int length) {
             int crc = 0x0;
 
             for (int i = start; i < (start + length); i++) {
@@ -709,6 +707,7 @@ public abstract class Bt20Base extends BtHRBase {
             if (bytesInBuffer < pos + 4)
                 return false;
 
+            //noinspection PointlessArithmeticExpression
             int b0 = getByte(buffer[pos + 0]);
             int b1 = getByte(buffer[pos + 1]); // len
             int b2 = getByte(buffer[pos + 2]);
@@ -725,6 +724,7 @@ public abstract class Bt20Base extends BtHRBase {
                 return false;
             }
 
+            //noinspection RedundantIfStatement
             if (bytesInBuffer < pos + b1)
                 return false;
 
@@ -774,6 +774,7 @@ public abstract class Bt20Base extends BtHRBase {
             if (bytesInBuffer < pos + FRAME_SIZE)
                 return false;
 
+            //noinspection PointlessArithmeticExpression
             int b0 = getByte(buffer[pos + 0]);
             int b1 = getByte(buffer[pos + 1]);
             int b2 = getByte(buffer[pos + 2]);
@@ -786,6 +787,7 @@ public abstract class Bt20Base extends BtHRBase {
             }
 
             int len = b1 >> 2;
+            //noinspection RedundantIfStatement
             if (bytesInBuffer < pos + len) {
                 return false;
             }
@@ -807,7 +809,7 @@ public abstract class Bt20Base extends BtHRBase {
         }
     }
 
-    static public int getByte(byte b) {
+    private static int getByte(byte b) {
         return b & 0xFF;
     }
 

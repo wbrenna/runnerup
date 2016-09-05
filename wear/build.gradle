@@ -2,17 +2,23 @@ apply plugin: 'com.android.application'
 
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion '22.0.1'
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion 20
-        targetSdkVersion 22
-        versionName "1.53"
-        versionCode 14000053
+        targetSdkVersion rootProject.ext.compileSdkVersion
+        versionName rootProject.ext.versionName
+        versionCode rootProject.ext.versionCode
+    }
+
+    dexOptions {
+        // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
+        preDexLibraries = preDexEnabled && !travisBuild
     }
 
     signingConfigs {
+        //noinspection GroovyMissingReturnStatement
         release {
         }
     }
@@ -29,8 +35,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.android.support:wearable:1.1.+'
-    compile 'com.google.android.gms:play-services-wearable:+'
+    compile 'com.google.android.support:wearable:1.1.0'
+    compile 'com.google.android.gms:play-services-wearable:9.4.0'
     compile project(':common')
 }
 
@@ -43,7 +49,6 @@ if (rootProject.file("release.properties").exists()) {
     android.signingConfigs.release.keyAlias = props.keyAlias
     android.signingConfigs.release.keyPassword = props.keyAliasPassword
 } else {
-    android.signingConfigs.release.storePassword = 'storePassword'
-    android.signingConfigs.release.keyAlias = 'keyAlias'
-    android.signingConfigs.release.keyPassword = 'keyPassword'
+    project.logger.info('INFO: Set the values storeFile, storePassword, keyAlias, and keyPassword in release.properties to sign the release.')
+    android.buildTypes.release.signingConfig = null
 }

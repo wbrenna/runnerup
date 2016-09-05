@@ -20,7 +20,7 @@
 	xmlns:tools="http://schemas.android.com/tools">
 
         <uses-sdk
-            android:minSdkVersion="8" />
+            android:minSdkVersion="14" />
 
 		<uses-feature
   			android:glEsVersion="0x00020000"
@@ -29,6 +29,7 @@
 		<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 		<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 		<uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+		<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 		<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 		<uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
 		<uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -42,7 +43,7 @@
 	<application
 	    android:icon="@drawable/icon"
 	    android:label="@string/app_name"
-		android:theme="@android:style/Theme.NoTitleBar">
+		android:theme="@style/AppTheme">
 
 		<activity
 			android:name=".view.MainLayout"
@@ -56,7 +57,9 @@
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
-				<data android:mimeType="application/octet-stream" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:mimeType="application/octet-stream"
+					android:scheme="http" />
 				<data android:host="*" />
 				<data android:pathPattern="runnerup.db.export" />
 			</intent-filter>
