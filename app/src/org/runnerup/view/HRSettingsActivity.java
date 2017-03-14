@@ -44,10 +44,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.GraphView.GraphViewData;
-import com.jjoe64.graphview.GraphViewSeries;
-import com.jjoe64.graphview.LineGraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.runnerup.R;
 import org.runnerup.hr.HRData;
@@ -60,6 +60,7 @@ import org.runnerup.widget.WidgetUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -84,9 +85,9 @@ public class HRSettingsActivity extends AppCompatActivity implements HRClient {
 
     Formatter formatter = null;
     GraphView graphView = null;
-    GraphViewSeries graphViewSeries = null;
-    final ArrayList<GraphViewData> graphViewListData = new ArrayList<GraphViewData>();
-    GraphViewData graphViewArrayData[] = new GraphViewData[0];
+    LineGraphSeries<DataPoint> graphViewSeries = null;
+    final ArrayList<DataPoint> graphViewListData = new ArrayList<>();
+    DataPoint graphViewArrayData[] = new DataPoint[0];
     static final int GRAPH_HISTORY_SECONDS = 180;
 
     DeviceAdapter deviceAdapter = null;
@@ -144,15 +145,18 @@ public class HRSettingsActivity extends AppCompatActivity implements HRClient {
         formatter = new Formatter(this);
         {
             LinearLayout graphLayout = (LinearLayout) findViewById(R.id.hr_graph_layout);
-            graphView = new LineGraphView(this, getString(R.string.Heart_rate)) {
+            graphView = new GraphView(this);
+            graphView.setTitle(getString(R.string.Heart_rate));
+            graphView.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
                 @Override
-                protected String formatLabel(double value, boolean isValueX) {
-                    if (!isValueX) {
-                        return formatter.formatHeartRate(Formatter.TXT_SHORT, value);
-                    } else
+                public String formatLabel(double value, boolean isValueX) {
+                    if (isValueX) {
                         return formatter.formatElapsedTime(Formatter.TXT_SHORT, (long) value);
+                    } else {
+                        return formatter.formatHeartRate(Formatter.TXT_SHORT, value);
+                    }
                 }
-            };
+            });
             graphLayout.addView(graphView);
         }
 
@@ -171,6 +175,14 @@ public class HRSettingsActivity extends AppCompatActivity implements HRClient {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.hrsettings_menu, menu);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Resources res = getResources();
+        boolean isChecked = prefs.getBoolean(res.getString(R.string.pref_bt_experimental), false);
+        MenuItem item = menu.findItem(R.id.menu_hrdevice_expermental);
+        item.setChecked(isChecked);
+        isChecked = prefs.getBoolean(res.getString(R.string.pref_bt_mock), false);
+        item = menu.findItem(R.id.menu_hrdevice_mock);
+        item.setChecked(isChecked);
         return true;
     }
 
@@ -179,12 +191,29 @@ public class HRSettingsActivity extends AppCompatActivity implements HRClient {
         switch (item.getItemId()) {
             case R.id.menu_hrsettings_clear:
                 clearHRSettings();
-                break;
+                return true;
             case R.id.menu_hrzones:
                 hrZonesClick.onClick(null);
-                break;
+                return true;
+            case R.id.menu_hrdevice_expermental:
+            case R.id.menu_hrdevice_mock:
+                boolean isChecked = !item.isChecked();
+                item.setChecked(isChecked);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                Resources res = getResources();
+                SharedPreferences.Editor editor = prefs.edit();
+                int key;
+                if (item.getItemId() == R.id.menu_hrdevice_expermental) {
+                    key = R.string.pref_bt_experimental;
+                } else {
+                    key = R.string.pref_bt_mock;
+                }
+                editor.putBoolean(res.getString(key), isChecked);
+                editor.commit();
+                providers = HRManager.getHRProviderList(this);
+                return true;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
     
     @Override
@@ -303,7 +332,7 @@ public class HRSettingsActivity extends AppCompatActivity implements HRClient {
         graphView.removeAllSeries();
         graphViewSeries = null;
         graphViewListData.clear();
-        graphViewArrayData = new GraphViewData[0];
+        graphViewArrayData = new DataPoint[0];
     }
 
     private void updateView() {
@@ -330,7 +359,7 @@ public class HRSettingsActivity extends AppCompatActivity implements HRClient {
             connectButton.setEnabled(false);
             connectButton.setText(getString(R.string.Connecting));
         } else {
-            connectButton.setEnabled(btName == null ? false : true);
+            connectButton.setEnabled(btName != null);
             connectButton.setText(getString(R.string.Connect));
         }
     }
@@ -511,17 +540,27 @@ public class HRSettingsActivity extends AppCompatActivity implements HRClient {
                 if(data.hasHeartRate)
                     hrValue = data.hrValue;
 
-                tvHR.setText(Long.toString(hrValue));
+                tvHR.setText(String.format(Locale.getDefault(), "%d", hrValue));
 
                 if (age != lastTimestamp) {
                     if (graphViewSeries == null) {
                         timerStartTime = System.currentTimeMillis();
-                        GraphViewData empty[] = {};
-                        graphViewSeries = new GraphViewSeries(empty);
+                        DataPoint empty[] = {};
+                        graphViewSeries = new LineGraphSeries<>(empty);
                         graphView.addSeries(graphViewSeries);
+                        graphView.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+                            @Override
+                            public String formatLabel(double value, boolean isValueX) {
+                                if (isValueX) {
+                                    return formatter.formatDistance(Formatter.TXT_SHORT, (long) value);
+                                } else {
+                                    return formatter.formatHeartRate(Formatter.TXT_SHORT, value);
+                                }
+                            }
+                        });
                     }
 
-                    graphViewListData.add(new GraphViewData((age - timerStartTime) / 1000, hrValue));
+                    graphViewListData.add(new DataPoint((age - timerStartTime) / 1000, hrValue));
                     while (graphViewListData.size() > GRAPH_HISTORY_SECONDS) {
                         graphViewListData.remove(0);
                     }

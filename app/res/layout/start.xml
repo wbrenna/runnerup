@@ -124,7 +124,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="\?" />
+                android:text="\?"
+                tools:ignore="HardcodedText" />
         </FrameLayout>
 
         <FrameLayout
@@ -139,14 +140,15 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/wear" />
+                android:src="@drawable/ic_wear"/>
 
             <TextView
                 android:id="@+id/wear_value_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="\?" />
+                android:text="\?"
+                tools:ignore="HardcodedText" />
         </FrameLayout>
     </LinearLayout>
 

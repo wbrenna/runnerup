@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <!--~ Copyright (C) 2014 jonas.oreland@gmail.com
   ~
   ~  This program is free software: you can redistribute it and/or modify
@@ -26,13 +26,10 @@
   <string name="metrics_heartrate">Puls</string>
   <!--format hint stuff-->
   <string name="Maximum_heart_rate_MHR">Maxpuls (MHR)</string>
-  <string name="Target_pace_HHMMSS">Måltempo (HH:MM:SS)</string>
-  <string name="Interval_time_HHMMSS">Intervall tid (HH:MM:SS)</string>
-  <string name="Interval_distance_m">Intervall distans (m)</string>
-  <string name="Rest_time_HHMMSS">Vilotid (HH:MM:SS)</string>
-  <string name="Rest_distance_m">Vilodistans (m)</string>
-  <string name="Duration_time_HHMMSS">Varaktighet tid (HH:MM:SS)</string>
-  <string name="Duration_distance_m">Varaktighet distans (m)</string>
+  <string name="Target_pace_HHMMSS">Måltempo</string>
+  <!--strings with argument to provide-->
+  <!--first argument is a date, second a time, for instance: "Yesterday at 13:32"-->
+  <string name="formatting_date_at_time">%1$s %2$s</string>
   <!--weird stuff: should it be placeholders or even removed?-->
   <string name="ok_rats">ok, nedrans</string>
   <!--other-->
@@ -46,11 +43,13 @@
   <string name="repeat">upprepning</string>
   <string name="time">tid</string>
   <string name="distance">distans</string>
-  <string name="Unknown">Okänt</string>
   <string name="Distance">Distans</string>
   <string name="speed">hastighet</string>
   <string name="pace">tempo</string>
   <string name="heart_rate_zone">pulszon</string>
+  <string name="cadence">kadens</string>
+  <string name="temperature">temperatur</string>
+  <string name="pressure">tryck</string>
   <string name="Zone">Zon</string>
   <string name="Device">Enhet</string>
   <string name="Start_hour">Starttid</string>
@@ -64,7 +63,6 @@
   <string name="Delete">Ta bort</string>
   <string name="Total">Total</string>
   <string name="Interval">Intervall</string>
-  <string name="Remaining">Återstående</string>
   <string name="Lap">Varv</string>
   <string name="New_lap">Nytt varv</string>
   <string name="Next_lap">Nästa varv</string>
@@ -83,8 +81,6 @@
   <string name="GPS_satellites">GPS satelliter</string>
   <string name="Start_GPS">Starta GPS</string>
   <string name="Duration">Varaktighet</string>
-  <string name="Duration_type">Varaktighet typ</string>
-  <string name="Target_type">Måltyp</string>
   <string name="Cancel">Avbryt</string>
   <string name="value">värde</string>
   <string name="Select_all">Markera alla</string>
@@ -118,7 +114,7 @@
   <string name="Age">Ålder</string>
   <string name="edit">redigera</string>
   <string name="Synchronizing">Synkroniserar:</string>
-  <string name="synchronizing_feed">synkroniserar flöde...</string>
+  <string name="synchronizing_feed">synkroniserar flöde…</string>
   <string name="OK">Ok</string>
   <string name="Table_format">Tabellformat</string>
   <string name="Clear_uploads">Rensa uppladdningar</string>
@@ -149,16 +145,16 @@
   <string name="Edit_step">Redigera steg</string>
   <string name="Create_new_audio_cue_scheme">Skapa nytt schema för ljudmeddelande</string>
   <string name="Great">Kanon!</string>
-  <string name="OK_darn">Ok... typiskt!</string>
+  <string name="OK_darn">Ok… typiskt!</string>
   <string name="Yes">Ja</string>
   <string name="Create">Skapa</string>
   <string name="Darn">Nedrans!</string>
   <string name="Dismiss">Avslå</string>
   <string name="No_way">Inte alls</string>
   <string name="No">Nej</string>
-  <string name="Loading">Laddar...</string>
+  <string name="Loading">Laddar…</string>
   <string name="Saving">Sparar</string>
-  <string name="Cancellingplease_wait">Avbryter... vänta</string>
+  <string name="Cancellingplease_wait">Avbryter… vänta</string>
   <string name="try_again_later">försök igen senare!</string>
   <string name="Are_you_sure">Är du säker?</string>
   <string name="Configure_audio_cues">Konfigurera ljudmeddelanden</string>
@@ -167,7 +163,6 @@
   <string name="Use_your_headset_to_startpauseresume_RunnerUp">Använd dina lurar för att starta/pausa/återuppta RunnerUp</string>
   <string name="Convert_reststep_with_type_distance_to_recoverystep_for_Intervaltab">Konvertera vilosteg med distans typ till återhämtningssteg för Interval-tabben</string>
   <string name="Convert_reststep_with_type_distance_to_recoverystep_for_Advancedtab">Konvertera vilosteg med distans typ till återhämtningssteg för Avancerat-tabben</string>
-  <string name="mm31kz513sg5">mm(31);kz(5,13);sg(5)</string>
   <string name="Export_database_to_sdcard_eg_for_upgrade">Exportera databas till sdkort (t.ex. före uppgradering)</string>
   <string name="Import_database_from_sdcard_eg_after_upgrade">Importera databas från sdkort (t.ex. efter uppgradering)</string>
   <string name="Coach_to_help_you_reach_target_if_having_set_target">Coach för att hjälpa dig nå målet (om mål är satt)</string>
@@ -180,27 +175,29 @@
   <string name="Autolap">Autovarv</string>
   <string name="Autolap_m">Autovarv (m)</string>
   <string name="Autopause">Autopaus</string>
-  <string name="Enable_RunnerUpLive">Aktivera RunnerUpLive</string>
+  <string name="Enable_RunnerUpLive">Aktivera Live</string>
   <string name="Headset_key_startstop">Hörlursknapp start/stopp</string>
   <string name="Activity_countdown">Nedräkning till aktivitet</string>
   <string name="Countdown_time_s">Nedräkningstid (s)</string>
   <string name="Unit_preference">Måttenhet</string>
   <string name="Auto_start_GPS">Autostarta GPS</string>
   <string name="Advanced_options">Avancerade inställningar</string>
+  <string name="Mapbox_default_style">Mapbox stil</string>
   <string name="RunnerUp_live_address">RunnerUpLive adress</string>
   <string name="Autopause_after_s">Autopausa efter (s)</string>
   <string name="Autopause_min_pace_minkm">Autopaus tempo (min/km)</string>
   <string name="Convert_rest_on_Interval_tab">Konvertera vila i Interval-tabben</string>
   <string name="Convert_rest_on_Advanced_tab">Konvertera vila i Avancerat-tabben</string>
   <string name="Target_pace_moving_average_seconds">Måltempo flytande medelvärde (s)</string>
-  <string name="Target_pace_grace_seconds">Måltempo väntetid</string>
+  <string name="Target_pace_grace_seconds">Måltempo anståndstid</string>
   <string name="Autolap_during_intervals">Autovarv vid intervaller</string>
   <string name="Add_countdown_after_step_that_ends_with_user_press">Lägg till nedräkning efter knapptryckningssteg</string>
   <string name="Step_countdown_time_s">Nedräkningssteg (s)</string>
   <string name="Smooth_pace_graph">Utjämning tempograf</string>
   <string name="Smooth_pace_filters">Utjämningsfilter tempo (s)</string>
-  <string name="Poll_interval_ms">Uppdaterings intervall (ms)</string>
-  <string name="Poll_distance_m">Uppdaterings distans (m)</string>
+  <string name="Poll_interval_ms">GPS Uppdaterings intervall (ms)</string>
+  <string name="Poll_distance_m">GPS Uppdaterings distans (m)</string>
+  <string name="Adjust_altitude">Justera GPS höjd till geoid (EGM96)</string>
   <string name="Export">Exportera</string>
   <string name="Import">Importera</string>
   <string name="Experimental_HRM_devices">Experimentella pulsmätare</string>
@@ -209,9 +206,9 @@
   <string name="About">Om</string>
   <string name="About_RunnerUp">Om RunnerUp</string>
   <string name="Triggers">Starta ljud vid</string>
-  <string name="Time_triggered_audio_cue">Tidstriggat ljudmeddelande</string>
+  <string name="Time_triggered_audio_cue">Meddelande triggat av tid</string>
   <string name="Cue_interval_s">Meddelande intervall (s)</string>
-  <string name="Distance_triggered_audio_cue">Distanstriggat meddelande</string>
+  <string name="Distance_triggered_audio_cue">Meddelande triggat av distans</string>
   <string name="Cue_intervall_m">Meddelande intervall (m)</string>
   <string name="End_of_lap_audio_cue">Meddelande vid varvslut</string>
   <string name="Mute_music_during_audio_cues">Tysta musik under ljudmeddelanden</string>
@@ -261,23 +258,19 @@
   <string name="Low_HRM_battery_level">Låg batterinivå i pulsmätare</string>
   <string name="High_HRM_battery_level">Hög batterinivå i pulsmätare</string>
   <string name="Warning">Varning</string>
-  <string name="The_battery_level_of_your_heartrate_monitor_is_low">Batterinivån i din pulsmätare är låg</string>
   <string name="Do_not_show_again">Visa inte igen</string>
-  <string name="Waiting_for_phone">Väntar på telefon</string>
-  <string name="Saving_on_phone">Sparar i telefonen</string>
+  <string name="Waiting_for_phone" tools:ignore="UnusedResources">Väntar på telefon</string>
+  <string name="Saving_on_phone" tools:ignore="UnusedResources">Sparar i telefonen</string>
   <string name="Save">Spara</string>
   <string name="Add_step">Lägg till steg</string>
   <string name="Add_repeat">Lägg till repetition</string>
   <string name="Discard">Ta bort</string>
   <string name="Failed_to_create_workout">Kunde inte skapa träningspass</string>
-  <string name="_sign_plus">+</string>
-  <string name="_sign_minus">-</string>
   <string name="Audio_cue_language">Språk för ljudmedelanden</string>
   <string name="Website">Hemsida</string>
   <string name="Automatic_upload">Automatisk uppladdning</string>
   <string name="Live">Live</string>
   <string name="Include_map_in_post">Inkludera karta i post</string>
-  <string name="Note_that_workouts_are_not_removed_from_1s_only_from_RunnerUp_list_of_workouts_uploaded_to_1s">Notera att aktiviteterna inte tas bort från %1$s, bara från RunnerUps lista av aktiviteter för %1$s.</string>
   <string name="Clear_uploads_from_phone">Ta bort aktiviteter (från telefon)</string>
   <string name="my_phone">Min telefon</string>
   <string name="Failed_to_import">Kunde inte importera:</string>
@@ -286,12 +279,11 @@
   <string name="Overwrite_existing">Skriv över existerande:</string>
   <string name="Create_new_workout">Skapa nytt träningspass</string>
   <string name="Set_workout_name">Ange namn för träningspass</string>
-  <string name="Downloading_1s_will_overwrite_2_workout_with_same_name">Ladda ner %1$s kommer skriva över träningpass %2$ med samma namn</string>
+  <string name="Downloading_1s_will_overwrite_2_workout_with_same_name">Ladda ner %1$s kommer skriva över existerande träningpass %2$s</string>
   <string name="Delete_workout">Ta bort träningspass</string>
   <string name="RunnerUp_workout">RunnerUp träningspass:</string>
   <string name="HinHere_is_a_workout_I_think_you_might_like">Hej\nHär är ett träningspass jag tror du skulle gilla.</string>
-  <string name="Share_workout">Dela träningspass...</string>
-  <string name="Not_much_to_say_at_this_point">Inte så mycket att tillägga just nu</string>
+  <string name="Share_workout">Dela träningspass…</string>
   <string name="New_audio_scheme">Nytt ljudschema</string>
   <string name="Default">Standard</string>
   <string name="Notes_about_your_workout">Anteckningar om ditt träningspass</string>
@@ -299,9 +291,25 @@
   <string name="Uploading_to_1s">Laddar upp till %1$s</string>
   <string name="Loading_activities">Laddar aktiviteter</string>
   <string name="Fetching_activities_from_1s">Hämtar aktiviteter från %1$s</string>
-  <string name="Distance_marker">Distansmarkör</string>
-  <string name="GoToWebsite">Gå till website</string>
-  <string name="Map_not_available_on_Froyo">Karta inte tillgänglig i Froyo</string>
   <string name="No_feed_to_show">Inget flöde att visa</string>
   <string name="Unused_currently">Används ej för närvarande</string>
+  <string name="Unknown">Okänt</string>
+  <string name="RunningFreeOnlinePasswordNotice">Notera: Använd den hemliga nyckel som lösenord från Add &gt; Sync Training &gt; SportTracks.</string>
+  <string name="Recording">Inspelning</string>
+  <string name="Sensors">Sensorer</string>
+  <string name="Maintenance">Underhåll</string>
+  <string name="cue_hrm_connection_restored">Återfått koppling till pulsmätare</string>
+  <string name="cue_hrm_connection_lost">Tappat koppling till pulsmätare</string>
+  <string name="HRM_connection_audio_cue">Meddelande triggat av koppling till pulsmätare</string>
+  <string name="latest_feed_click_to_refresh">Senaste flöde (klicka för att uppdatera)</string>
+  <string name="log_extended_gps_summary">Exportera enbart i GPX</string>
+  <string name="log_extended_gps_title">Logga utökad GPS noggrannhetsdata</string>
+  <string name="use_step_sensor_title">Steg sensor</string>
+  <string name="use_step_sensor_summary">Använd till kadens</string>
+  <string name="use_temperature_sensor">Temperatur sensor</string>
+  <string name="use_pressure_sensor_title">Tryck sensor</string>
+  <string name="use_pressure_sensor_summary">Använd barometer för höjd</string>
+  <string name="adjust_barometer_altitude_from_gps">Justera barometerhöjd till GPS höjd</string>
+  <string name="adjust_barometer_elevation_from_gps_summary">Använd GPS-höjd vid start för att sätta starthöjd</string>
+  <string name="google_play_not_installed">Google Play Services är inte installerade</string>
 </resources>

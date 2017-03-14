@@ -37,13 +37,14 @@ android {
         latest {
             manifest.srcFile 'latest/AndroidManifest.xml'
             java.srcDirs = ['latest/java']
+            assets.srcDirs = ['latest/assets']
         }
         test.setRoot('test')
     }
 
     productFlavors {
         latest {
-            minSdkVersion 14
+            minSdkVersion 15
             targetSdkVersion rootProject.ext.compileSdkVersion
             versionName rootProject.ext.versionName
             versionCode rootProject.ext.versionCode
@@ -59,7 +60,7 @@ android {
     defaultConfig {
         applicationId = doExtractStringFromManifest("package")
         //By default all AppCompat translations are included, saves 350KB
-        resConfigs "ar", "ca", "de", "en", "es", "fr", "hu", "id", "it", "ja", "lt", "nl", "pl", "pt", "ru", "sv", "tr"
+        resConfigs "ar", "bs", "cs", "ca", "de", "en", "es", "fr", "hu", "id", "it", "ja", "lt", "nb", "nl", "pl", "pt", "ru", "sv", "tr"
     }
 
     signingConfigs {
@@ -81,35 +82,57 @@ android {
         //disable specific checks for specific paths
         lintConfig file("lint.xml")
         checkReleaseBuilds true
-        //promote to error
-        fatal 'InlinedApi'
-        //Should be enabled, see PR #333
-        warning 'MissingQuantity', 'ImpliedQuantity'
-        // Ignore some specific checks, also some specific with path in lint.xml
-        warning 'MissingTranslation'
+        //promote to error, must be handled
+        fatal 'InlinedApi', 'InconsistentArrays'
+        //TODO: See GradleCompatible comments, check manually with ./gradlew app:dependencies
+        warning 'GradleCompatible'
+        //All translations will not be complete
+        ignore 'MissingTranslation'
+        //icon with all densities are not included - don't bother
+        ignore 'IconMissingDensityFolder'
+        //apply() is supported from SDK 9, but min version is 8
+        //Suppress before Android Studio 2.3
+        //ignore 'ApplySharedPref'
+
         showAll true
+        //debug issues in Travis
+        textReport true
+        textOutput 'stdout'
     }
 }
 
 repositories {
-    mavenCentral()
+    //jcenter and mavenCentral normally have the same packages but there may be a delay after updating the primary
+    jcenter() //Google
+    mavenCentral() //MapBox GraphView
     maven { url "https://oss.sonatype.org/content/groups/public/" } //pebblekit
 }
 
 dependencies {
-    //design uses com.android.support:appcompat, not explicitly required
-    compile 'com.android.support:design:24.1.1'
-    latestCompile 'com.google.android.gms:play-services-wearable:9.4.0'
-    latestCompile 'com.getpebble:pebblekit:3.1.0'
-    compile('com.mapbox.mapboxsdk:mapbox-android-sdk:0.7.4@aar') {
-        transitive = true
-    }
-    compile 'com.jjoe64:graphview:3.1.4'
     compile project(':common')
     compile project(':hrdevice')
     latestWearApp project(':wear')
+
+    //Lint bug: To avoid the issue GradleDependency in Froyo, both Latest/Froyo must be suppressed
+    //(Latest dependency check on the other libraries)
+    //noinspection GradleDependency
+    latestCompile "com.android.support:design:${rootProject.ext.supportLibrary}"
+    //GradleCompatible: support-v4 is not used by app source but mapbox, graphview, play-services-wearable
+    //force same version as in the app
+    latestCompile "com.android.support:support-v4:${rootProject.ext.supportLibrary}"
+
+    //noinspection GradleDependency
+    froyoCompile 'com.android.support:design:24.1.0' //SDK <10 dropped in 24.2
+
+    latestCompile "com.google.android.gms:play-services-wearable:${rootProject.ext.googlePlayServicesVersion}"
+    latestCompile 'com.getpebble:pebblekit:4.0.1'
+    latestCompile ('com.mapbox.mapboxsdk:mapbox-android-sdk:4.2.0@aar'){
+        transitive=true
+    }
+    compile 'com.jjoe64:graphview:4.2.1'
+
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.mockito:mockito-core:2.3.7'
 }
 
 allprojects {

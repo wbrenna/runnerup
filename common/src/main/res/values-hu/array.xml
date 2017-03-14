@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string-array name="unitEntries">
     <item>Mérföld</item>
     <item>Kilométer</item>
@@ -13,42 +13,26 @@
     <item>Bemelegítés</item>
     <item>Aktív</item>
     <item>Pihenés</item>
-    <item>Felépülés</item>
+    <item>Regeneráció</item>
     <item>Levezetés</item>
   </string-array>
-  <!--same order as above, same values as Intensity-->
   <string-array name="duration_types">
     <item>Megnyomásig</item>
     <item>Idő</item>
     <item>Távolság</item>
   </string-array>
-  <!--same order as above, same values as Dimension-->
   <string-array name="target_types">
     <item>Nincs</item>
     <item>Tempó</item>
     <item>Pulzus zóna</item>
   </string-array>
-  <!--Note: same order as above, same values as Dimension-->
   <!--Note: keep in same order as DB.ACCOUNT.SPORT_-->
   <string-array name="sportEntries">
     <item>Futás</item>
     <item>Kerékpározás</item>
     <item>Egyéb</item>
-  </string-array>
-  <string-array name="sportEntriesExperimental">
-    <item>Futás</item>
-    <item>Kerékpározás</item>
-    <item>Egyév</item>
     <item>Tájfutás</item>
     <item>Gyaloglás</item>
-  </string-array>
-  <string-array name="muteEntries">
-    <item>Nem</item>
-    <item>Igen</item>
-  </string-array>
-  <string-array name="muteValues">
-    <item>nem</item>
-    <item>igen</item>
   </string-array>
   <string-array name="types">
     <item>Idő</item>
@@ -58,6 +42,4 @@
     <item>Férfi</item>
     <item>Nő</item>
   </string-array>
-  <!--Audio cue languages-->
-  <!--Note: keep in same order as languagesNames-->
 </resources>

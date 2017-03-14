@@ -23,9 +23,13 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 
+import org.runnerup.BuildConfig;
 import org.runnerup.common.util.Constants.DB;
 import org.runnerup.tracker.Tracker;
 import org.runnerup.tracker.component.TrackerHRM;
+import org.runnerup.tracker.component.TrackerCadence;
+import org.runnerup.tracker.component.TrackerTemperature;
+import org.runnerup.tracker.component.TrackerPressure;
 import org.runnerup.util.HRZones;
 import org.runnerup.workout.feedback.RUTextToSpeech;
 
@@ -109,7 +113,7 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
     }
 
     public void onInit(Workout w) {
-        assert (w == this);
+        if (BuildConfig.DEBUG && w != this) { throw new AssertionError(); }
         for (Step a : steps) {
             a.onInit(this);
         }
@@ -126,7 +130,7 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
     }
 
     public void onEnd(Workout w) {
-        assert (w == this);
+        if (BuildConfig.DEBUG && w != this) { throw new AssertionError(); }
         for (Step a : steps) {
             a.onEnd(this);
         }
@@ -137,7 +141,7 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
     }
 
     public void onStart(Scope s, Workout w) {
-        assert (w == this);
+        if (BuildConfig.DEBUG && w != this) { throw new AssertionError(); }
 
         initFeedback();
 
@@ -283,6 +287,12 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
                 return getHeartRate(scope);
             case HRZ:
                 return getHeartRateZone(scope);
+            case CAD:
+                return getCadence(scope);
+            case TEMPERATURE:
+                return getTemperature(scope);
+            case PRESSURE:
+                return getPressure(scope);
         }
         return 0;
     }
@@ -296,7 +306,7 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
             case LAP:
                 if (currentStep != null)
                     return currentStep.getDistance(this, scope);
-                assert (false);
+                if (BuildConfig.DEBUG) { throw new AssertionError(); }
                 break;
             case CURRENT:
                 break;
@@ -313,7 +323,7 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
             case LAP:
                 if (currentStep != null)
                     return currentStep.getTime(this, scope);
-                assert (false);
+                if (BuildConfig.DEBUG) { throw new AssertionError(); }
                 break;
             case CURRENT:
                 return System.currentTimeMillis() / 1000; // now
@@ -334,7 +344,6 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
             case LAP:
                 if (currentStep != null)
                     return currentStep.getSpeed(this, scope);
-                assert (false);
                 break;
             case CURRENT:
                 Double s = tracker.getCurrentSpeed();
@@ -404,11 +413,76 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
 
         double t = getTime(scope); // in seconds
         double b = getHeartbeats(scope); // total (estimated) beats during
-                                         // workout
+        // workout
 
         if (t != 0) {
             return (60 * b) / t; // bpm
         }
+        return 0.0;
+    }
+
+    @Override
+    public double getCadence(Scope scope) {
+        switch (scope) {
+            case CURRENT: {
+                Float val = tracker.getCurrentCadence();
+                if (val == null)
+                    return -1; //TODO should not be used
+                return val;
+            }
+            case LAP:
+            case STEP:
+            case ACTIVITY:
+                break;
+        }
+
+        double t = getTime(scope); // in seconds
+        double b = -1; //TODO get steps for scope
+
+        if (BuildConfig.DEBUG) { throw new AssertionError(); }
+        if (t != 0) {
+            return (60 * b)/ 2 / t; // bpm
+        }
+        return 0.0;
+    }
+
+    @Override
+    public double getTemperature(Scope scope) {
+        switch (scope) {
+            case CURRENT: {
+                Float val = tracker.getCurrentTemperature();
+                if (val == null)
+                    return -1;  //TODO should not be used
+                return val;
+            }
+            case LAP:
+            case STEP:
+            case ACTIVITY:
+                break;
+        }
+
+        //TODO
+        if (BuildConfig.DEBUG) { throw new AssertionError(); }
+        return 0.0;
+    }
+
+    @Override
+    public double getPressure(Scope scope) {
+        switch (scope) {
+            case CURRENT: {
+                Float val = tracker.getCurrentPressure();
+                if (val == null)
+                    return -1;  //TODO should not be used
+                return val;
+            }
+            case LAP:
+            case STEP:
+            case ACTIVITY:
+                break;
+        }
+
+        //TODO
+        if (BuildConfig.DEBUG) { throw new AssertionError(); }
         return 0.0;
     }
 
@@ -431,6 +505,12 @@ public class Workout implements WorkoutComponent, WorkoutInfo {
                     !hrZones.isConfigured() ||
                     !tracker.isComponentConnected(TrackerHRM.NAME))
                 return false;
+        } else if (dim == Dimension.CAD) {
+            return tracker.isComponentConnected(TrackerCadence.NAME);
+        } else if (dim == Dimension.TEMPERATURE) {
+            return tracker.isComponentConnected(TrackerTemperature.NAME);
+        } else if (dim == Dimension.PRESSURE) {
+            return tracker.isComponentConnected(TrackerPressure.NAME);
         } else if ((dim == Dimension.SPEED || dim == Dimension.PACE) &&
                 scope == Scope.CURRENT) {
             return tracker.getCurrentSpeed() != null;

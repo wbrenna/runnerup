@@ -29,7 +29,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
@@ -102,10 +102,20 @@ public class TrackerWear extends DefaultTrackerComponent
         return NAME;
     }
 
+    private boolean hasPlay() {
+        int result;
+        try {
+            result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
+        } catch(Exception e) {
+            return false;
+        }
+        return (result == ConnectionResult.SUCCESS);
+    }
+
     @Override
     public TrackerComponent.ResultCode onInit(final Callback callback, Context context) {
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) !=
-                ConnectionResult.SUCCESS) {
+        this.context = context;
+        if (!hasPlay()) {
             return ResultCode.RESULT_NOT_SUPPORTED;
         }
 
@@ -118,7 +128,6 @@ public class TrackerWear extends DefaultTrackerComponent
         }
 
         tracker.registerTrackerStateListener(this);
-        this.context = context;
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override

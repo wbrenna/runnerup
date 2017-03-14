@@ -21,6 +21,8 @@ import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
@@ -29,8 +31,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.runnerup.BuildConfig;
+import org.runnerup.R;
 import org.runnerup.common.tracker.TrackerState;
 import org.runnerup.common.util.Constants;
 import org.runnerup.common.util.ValueModel;
@@ -43,10 +48,14 @@ import org.runnerup.notification.NotificationStateManager;
 import org.runnerup.notification.OngoingState;
 import org.runnerup.tracker.component.TrackerComponent;
 import org.runnerup.tracker.component.TrackerComponentCollection;
+import org.runnerup.tracker.component.TrackerElevation;
 import org.runnerup.tracker.component.TrackerGPS;
 import org.runnerup.tracker.component.TrackerHRM;
 import org.runnerup.tracker.component.TrackerPebble;
 import org.runnerup.tracker.component.TrackerReceiver;
+import org.runnerup.tracker.component.TrackerCadence;
+import org.runnerup.tracker.component.TrackerTemperature;
+import org.runnerup.tracker.component.TrackerPressure;
 import org.runnerup.tracker.component.TrackerTTS;
 import org.runnerup.tracker.component.TrackerWear;
 import org.runnerup.tracker.filter.PersistentGpsLoggerListener;
@@ -76,9 +85,14 @@ public class Tracker extends android.app.Service implements
     private final Handler handler = new Handler();
 
     TrackerComponentCollection components = new TrackerComponentCollection();
+    //Some trackers may select separate sensors depending on sport, handled in onBind()
     TrackerGPS trackerGPS = (TrackerGPS) components.addComponent(new TrackerGPS(this));
     TrackerHRM trackerHRM = (TrackerHRM) components.addComponent(new TrackerHRM());
     TrackerTTS trackerTTS = (TrackerTTS) components.addComponent(new TrackerTTS());
+    private TrackerCadence trackerCadence = (TrackerCadence) components.addComponent(new TrackerCadence());
+    private TrackerTemperature trackerTemperature = (TrackerTemperature) components.addComponent(new TrackerTemperature());
+    private TrackerPressure trackerPressure = (TrackerPressure) components.addComponent(new TrackerPressure());
+    private TrackerElevation trackerElevation = (TrackerElevation) components.addComponent(new TrackerElevation(this, trackerGPS, trackerPressure));
     TrackerReceiver trackerReceiver = (TrackerReceiver) components.addComponent(
             new TrackerReceiver(this));
     TrackerWear trackerWear; // created if version is sufficient
@@ -110,6 +124,8 @@ public class Tracker extends android.app.Service implements
      * Last location given by LocationManager
      */
     Location mLastLocation = null;
+    //Second to last location - to get speed
+    Location mLast2Location = null;
 
     /**
      * Last location given by LocationManager when in state STARTED
@@ -175,7 +191,7 @@ public class Tracker extends android.app.Service implements
             case PAUSED:
             case ERROR:
             case STOPPED:
-                assert(false);
+                if (BuildConfig.DEBUG) { throw new AssertionError(); }
                 return;
             case CLEANUP:
                 /**
@@ -189,9 +205,7 @@ public class Tracker extends android.app.Service implements
 
         TrackerComponent.ResultCode result = components.onInit(onInitCallback,
                 getApplicationContext());
-        if (result == TrackerComponent.ResultCode.RESULT_PENDING) {
-            return;
-        } else {
+        if (result != TrackerComponent.ResultCode.RESULT_PENDING) {
             onInitCallback.run(components, result);
         }
     }
@@ -270,7 +284,7 @@ public class Tracker extends android.app.Service implements
             case PAUSED:
             case ERROR:
             case STOPPED:
-                assert(false);
+                if (BuildConfig.DEBUG) { throw new AssertionError(); }
                 return;
         }
 
@@ -284,9 +298,7 @@ public class Tracker extends android.app.Service implements
 
         TrackerComponent.ResultCode result = components.onConnecting(onConnectCallback,
                 getApplicationContext());
-        if (result == TrackerComponent.ResultCode.RESULT_PENDING) {
-            return;
-        } else {
+        if (result != TrackerComponent.ResultCode.RESULT_PENDING) {
             onConnectCallback.run(components, result);
         }
     }
@@ -309,7 +321,9 @@ public class Tracker extends android.app.Service implements
     }
 
     private long createActivity(int sport) {
-        assert (state.get() == TrackerState.INIT);
+        Resources res = getResources();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean logGpxAccuracy = prefs.getBoolean(res.getString(R.string.pref_log_gpx_accuracy), false);
         /**
          * Create an Activity instance
          */
@@ -320,7 +334,7 @@ public class Tracker extends android.app.Service implements
         tmp.clear();
         tmp.put(DB.LOCATION.ACTIVITY, mActivityId);
         tmp.put(DB.LOCATION.LAP, 0); // always start with lap 0
-        mDBWriter = new PersistentGpsLoggerListener(mDB, DB.LOCATION.TABLE, tmp);
+        mDBWriter = new PersistentGpsLoggerListener(mDB, DB.LOCATION.TABLE, tmp, logGpxAccuracy);
         return mActivityId;
     }
 
@@ -330,7 +344,7 @@ public class Tracker extends android.app.Service implements
 
     public void start() {
 //        Log.e(getClass().getName(), "Tracker.start() state: " + state.get());
-        assert (state.get() == TrackerState.CONNECTED);
+        if (BuildConfig.DEBUG && state.get() != TrackerState.CONNECTED) { throw new AssertionError(); }
 
         // connect workout and tracker
         workout.setTracker(this);
@@ -387,6 +401,7 @@ public class Tracker extends android.app.Service implements
         bindValues.put(Workout.KEY_FORMATTER, new Formatter(ctx));
         bindValues.put(Workout.KEY_HRZONES, new HRZones(ctx));
         bindValues.put(Workout.KEY_MUTE, workout.getMute());
+        bindValues.put(DB.ACTIVITY.SPORT, workout.getSport());
 
         components.onBind(bindValues);
 
@@ -484,7 +499,7 @@ public class Tracker extends android.app.Service implements
             case INITIALIZED:
             case CONNECTING:
             case CONNECTED:
-                assert (false);
+                if (BuildConfig.DEBUG) { throw new AssertionError(); }
                 return;
             case PAUSED:
             case STOPPED:
@@ -523,7 +538,7 @@ public class Tracker extends android.app.Service implements
                 // it's ok to "abort" connecting
                 break;
             case STARTED:
-                assert(false);
+                if (BuildConfig.DEBUG) { throw new AssertionError(); }
                 return;
             case CLEANUP:
                 return;
@@ -557,8 +572,11 @@ public class Tracker extends android.app.Service implements
     };
 
     public void completeActivity(boolean save) {
-        assert (state.get() == TrackerState.PAUSED ||
-                state.get() == TrackerState.STOPPED);
+        if (BuildConfig.DEBUG &&
+                state.get() != TrackerState.PAUSED &&
+                state.get() != TrackerState.STOPPED) {
+            throw new AssertionError();
+        }
 
         setNextLocationType(DB.LOCATION.TYPE_END);
         if (mActivityLastLocation != null) {
@@ -592,6 +610,14 @@ public class Tracker extends android.app.Service implements
             tmp.put(Constants.DB.ACTIVITY.MAX_HR, mMaxHR);
         tmp.put(Constants.DB.ACTIVITY.DISTANCE, mElapsedDistance);
         tmp.put(Constants.DB.ACTIVITY.TIME, getTime()); // time should be updated last for conditionalRecompute
+        if (TrackerPressure.isAvailable(this)) {
+            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean enabled = prefs.getBoolean(this.getString(org.runnerup.R.string.pref_use_pressure_sensor), false);
+            if (enabled) {
+                //Save information about barometer usage, used in uploads (like Strava)
+                tmp.put(DB.ACTIVITY.META_DATA, DB.ACTIVITY.WITH_BAROMETER);
+            }
+        }
 
         String key[] = {
                 Long.toString(mActivityId)
@@ -624,22 +650,23 @@ public class Tracker extends android.app.Service implements
 
     @Override
     public void onLocationChanged(Location arg0) {
+        //Elevation depends on GPS updates
+        trackerElevation.onLocationChanged(arg0);
         onLocationChangedImpl(arg0, false);
     }
 
     private void onLocationChangedImpl(Location arg0, boolean internal) {
         long now = System.currentTimeMillis();
-        if (mBug23937Checked == false) {
+        if (!mBug23937Checked) {
             long gpsTime = arg0.getTime();
-            long utcTime = now;
-            if (gpsTime > utcTime + 3 * 1000) {
-                mBug23937Delta = utcTime - gpsTime;
+            if (gpsTime > now + 3 * 1000) {
+                mBug23937Delta = now - gpsTime;
             } else {
                 mBug23937Delta = 0;
             }
             mBug23937Checked = true;
-            Log.e(getClass().getName(), "Bug23937: gpsTime: " + gpsTime + " utcTime: " + utcTime
-                    + " (diff: " + Math.abs(gpsTime - utcTime) + ") => delta: " + mBug23937Delta);
+            Log.e(getClass().getName(), "Bug23937: gpsTime: " + gpsTime + " utcTime: " + now
+                    + " (diff: " + Math.abs(gpsTime - now) + ") => delta: " + mBug23937Delta);
         }
         if (mBug23937Delta != 0) {
             arg0.setTime(arg0.getTime() + mBug23937Delta);
@@ -647,6 +674,10 @@ public class Tracker extends android.app.Service implements
 
         if (internal || state.get() == TrackerState.STARTED) {
             Integer hrValue = getCurrentHRValue(now, MAX_HR_AGE);
+            Double eleValue = getCurrentElevation();
+            Float cadValue = getCurrentCadence();
+            Float temperatureValue = getCurrentTemperature();
+            Float pressureValue = getCurrentPressure();
             if (mActivityLastLocation != null) {
                 double timeDiff = (double) (arg0.getTime() - mActivityLastLocation
                         .getTime());
@@ -666,13 +697,13 @@ public class Tracker extends android.app.Service implements
                 if (hrValue != null) {
                     mHeartbeats += (hrValue * timeDiff) / (60 * 1000);
                     mHeartbeatMillis += timeDiff; // TODO handle loss of HRM
-                                                  // connection
+                    // connection
                     mMaxHR = Math.max(hrValue, mMaxHR);
                 }
             }
             mActivityLastLocation = arg0;
 
-            mDBWriter.onLocationChanged(arg0, hrValue);
+            mDBWriter.onLocationChanged(arg0, eleValue, mElapsedTimeMillis, mElapsedDistance, hrValue, cadValue, temperatureValue, pressureValue);
 
             switch (mLocationType) {
                 case DB.LOCATION.TYPE_START:
@@ -685,13 +716,14 @@ public class Tracker extends android.app.Service implements
                 case DB.LOCATION.TYPE_PAUSE:
                     break;
                 case DB.LOCATION.TYPE_END:
-                    assert (false);
+                    if (!internal && BuildConfig.DEBUG) { throw new AssertionError(); }
                     break;
             }
             liveLog(mLocationType);
 
             notificationStateManager.displayNotificationState(activityOngoingState);
         }
+        mLast2Location = mLastLocation;
         mLastLocation = arg0;
     }
 
@@ -799,6 +831,10 @@ public class Tracker extends android.app.Service implements
         return component.isConnected();
     }
 
+    public HRProvider getHRProvider() {
+        return (trackerHRM.getHrProvider());
+    }
+
     public Integer getCurrentHRValue(long now, long maxAge) {
         HRProvider hrProvider = trackerHRM.getHrProvider();
         if (hrProvider == null)
@@ -813,28 +849,36 @@ public class Tracker extends android.app.Service implements
     public Integer getCurrentHRValue() {
         return getCurrentHRValue(System.currentTimeMillis(), 3000);
     }
+    public Float getCurrentCadence() {
+        return trackerCadence.getValue();
+    }
+    public Float getCurrentTemperature() {
+        return trackerTemperature.getValue();
+    }
+    public Float getCurrentPressure() {
+        return trackerPressure.getValue();
+    }
+    public Double getCurrentElevation() {
+        return trackerElevation.getValue();
+    }
 
     public Double getCurrentSpeed() {
         return getCurrentSpeed(System.currentTimeMillis(), 3000);
     }
 
-    public Double getCurrentPace() {
-        Double speed = getCurrentSpeed();
-        if (speed == null)
-            return null;
-        if (speed == 0.0)
-            return Double.MAX_VALUE;
-        return 1000 / (speed * 60);
-    }
-
     private Double getCurrentSpeed(long now, long maxAge) {
         if (mLastLocation == null)
             return null;
-        if (!mLastLocation.hasSpeed())
-            return null;
         if (now > mLastLocation.getTime() + maxAge)
             return null;
-        return (double) mLastLocation.getSpeed();
+        double speed = mLastLocation.getSpeed();
+        if ((!mLastLocation.hasSpeed() || speed == 0.0f)
+                && mLastLocation != null && mLast2Location != null &&
+                mLastLocation.getTime() > mLast2Location.getTime() ) {
+            //Some Android (at least emulators) do not implement getSpeed() (even if hasSpeed() is true)
+            speed = mLastLocation.distanceTo(mLast2Location) * 1000 / (mLastLocation.getTime() - mLast2Location.getTime());
+        }
+        return speed;
     }
 
     public double getHeartbeats() {

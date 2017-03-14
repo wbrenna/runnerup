@@ -44,6 +44,9 @@ import android.util.Log;
 import org.runnerup.BuildConfig;
 import org.runnerup.R;
 import org.runnerup.db.DBHelper;
+import org.runnerup.tracker.component.TrackerCadence;
+import org.runnerup.tracker.component.TrackerPressure;
+import org.runnerup.tracker.component.TrackerTemperature;
 import org.runnerup.util.FileUtil;
 import org.runnerup.widget.AboutPreference;
 
@@ -54,34 +57,63 @@ public class SettingsActivity extends PreferenceActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback{
 
     public void onCreate(Bundle savedInstanceState) {
+        Resources res = getResources();
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
         setContentView(R.layout.settings_wrapper);
         {
-            Preference btn = findPreference("exportdb");
+            Preference btn = findPreference(res.getString(R.string.pref_exportdb));
             btn.setOnPreferenceClickListener(onExportClick);
         }
         {
-            Preference btn = findPreference("importdb");
+            Preference btn = findPreference(res.getString(R.string.pref_importdb));
             btn.setOnPreferenceClickListener(onImportClick);
         }
         {
-            Preference btn = findPreference("prunedb");
+            Preference btn = findPreference(res.getString(R.string.pref_prunedb));
             btn.setOnPreferenceClickListener(onPruneClick);
+        }
+        {
+            //Currently unused, should maybe be removed?
+            getPreferenceManager().findPreference(res.getString(R.string.pref_experimental_features)).setEnabled(false);
         }
 
         //remove google play notices from froyo since we do not use it
-        if (BuildConfig.FLAVOR.equals("froyo") && !AboutPreference.isGooglePlayServicesAvailable(this)) {
-            Preference pref = findPreference("googleplayserviceslegalnotices");
-            PreferenceCategory category = (PreferenceCategory)findPreference("aboutcategory");
+        if (BuildConfig.FLAVOR.equals("froyo") || !AboutPreference.isGooglePlayServicesAvailable(this)) {
+            Preference pref = findPreference(res.getString(R.string.pref_googleplayserviceslegalnotices));
+            PreferenceCategory category = (PreferenceCategory)findPreference(res.getString(R.string.pref_aboutcategory));
             category.removePreference(pref);
         }
 
-        if (!hasHR(this)) {
-            Preference pref = findPreference("cue_configure_hrzones");
-            getPreferenceScreen().removePreference(pref);
+        //Geoid correction is not included in Froyo
+        if (BuildConfig.FLAVOR.equals("froyo")) {
+            getPreferenceManager().findPreference(res.getString(R.string.pref_altitude_adjust)).setEnabled(false);
+            getPreferenceScreen().removePreference(getPreferenceManager().findPreference("map_preferencescreen"));
+            getPreferenceScreen().removePreference(getPreferenceManager().findPreference("graph_preferencescreen"));
         }
 
+        if (!hasHR(this)) {
+            getPreferenceManager().findPreference(res.getString(R.string.cue_configure_hrzones)).setEnabled(false);
+            getPreferenceManager().findPreference(res.getString(R.string.pref_battery_level_low_threshold)).setEnabled(false);
+            getPreferenceManager().findPreference(res.getString(R.string.pref_battery_level_high_threshold)).setEnabled(false);
+        }
+        {
+            Preference pref = findPreference(this.getString(R.string.pref_experimental_features));
+            pref.setSummary(null);
+        }
+
+        if (!TrackerCadence.isAvailable(this)) {
+            Preference pref = findPreference(this.getString(R.string.pref_use_cadence_step_sensor));
+            pref.setEnabled(false);
+        }
+        if (!TrackerTemperature.isAvailable(this)) {
+            Preference pref = findPreference(this.getString(R.string.pref_use_temperature_sensor));
+            pref.setEnabled(false);
+        }
+        if (!TrackerPressure.isAvailable(this)) {
+            Preference pref = findPreference(this.getString(R.string.pref_use_pressure_sensor));
+            pref.setEnabled(false);
+        }
     }
 
     public static boolean hasHR(Context ctx) {
@@ -89,9 +121,7 @@ public class SettingsActivity extends PreferenceActivity
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
         String btAddress = prefs.getString(res.getString(R.string.pref_bt_address), null);
         String btProviderName = prefs.getString(res.getString(R.string.pref_bt_provider), null);
-        if (btProviderName != null && btAddress != null)
-            return true;
-        return false;
+        return btProviderName != null && btAddress != null;
     }
 
     @SuppressLint("InlinedApi")
@@ -103,6 +133,7 @@ public class SettingsActivity extends PreferenceActivity
                 != PackageManager.PERMISSION_GRANTED) {
             ret = false;
 
+            //noinspection StatementWithEmptyBody
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 //The caller informs the user, no toast or SnackBar
@@ -118,13 +149,14 @@ public class SettingsActivity extends PreferenceActivity
         return ret;
     }
 
-    public static boolean requestWriteStoragePermissions(final Activity activity) {
+    private static boolean requestWriteStoragePermissions(final Activity activity) {
         boolean ret = true;
         if (ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             ret = false;
 
+            //noinspection StatementWithEmptyBody
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 //The caller informs the user, no toast or SnackBar
@@ -151,6 +183,7 @@ public class SettingsActivity extends PreferenceActivity
 
         if (requestCode == REQUEST_READ_EXTERNAL_STORAGE || requestCode == REQUEST_WRITE_EXTERNAL_STORAGE) {
             // Check if the only required permission has been granted (could react on the response)
+            //noinspection StatementWithEmptyBody
             if (grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //OK, could redo request here
             } else {
@@ -169,7 +202,7 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
-    final OnPreferenceClickListener onExportClick = new OnPreferenceClickListener() {
+    private final OnPreferenceClickListener onExportClick = new OnPreferenceClickListener() {
 
         @Override
         public boolean onPreferenceClick(Preference preference) {
@@ -203,7 +236,7 @@ public class SettingsActivity extends PreferenceActivity
         }
     };
 
-    final OnPreferenceClickListener onImportClick = new OnPreferenceClickListener() {
+    private final OnPreferenceClickListener onImportClick = new OnPreferenceClickListener() {
 
         @Override
         public boolean onPreferenceClick(Preference preference) {
@@ -229,7 +262,7 @@ public class SettingsActivity extends PreferenceActivity
         }
     };
 
-    final OnPreferenceClickListener onPruneClick = new OnPreferenceClickListener() {
+    private final OnPreferenceClickListener onPruneClick = new OnPreferenceClickListener() {
 
         @Override
         public boolean onPreferenceClick(Preference preference) {

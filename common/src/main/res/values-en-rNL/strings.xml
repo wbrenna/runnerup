@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <!--~ Copyright (C) 2014 jonas.oreland@gmail.com
   ~
   ~  This program is free software: you can redistribute it and/or modify
@@ -26,15 +26,11 @@
   <string name="metrics_heartrate">Hr</string>
   <!--format hint stuff-->
   <string name="Maximum_heart_rate_MHR">Maximale hartslag (HFmax)</string>
-  <string name="Target_pace_HHMMSS">Doel tempo (HH:MM:SS)</string>
-  <string name="Interval_time_HHMMSS">Interval tijd (HH:MM:SS)</string>
-  <string name="Interval_distance_m">Interval afstand (m)</string>
-  <string name="Rest_time_HHMMSS">Rust tijd (HH:MM:SS)</string>
-  <string name="Rest_distance_m">Rust afstand (m)</string>
-  <string name="Duration_time_HHMMSS">Duur tijd (HH:MM:SS)</string>
-  <string name="Duration_distance_m">Duur afstand (m)</string>
+  <string name="Target_pace_HHMMSS">Doel tempo</string>
+  <!--strings with argument to provide-->
+  <!--first argument is a date, second a time, for instance: "Yesterday at 13:32"-->
   <!--weird stuff: should it be placeholders or even removed?-->
-  <string name="ok_rats">ok, rats</string>
+  <string name="ok_rats">OK, rats</string>
   <!--other-->
   <string name="Google_Play_Services_Legal_Notices">Google Play Services Wettelijke Bepalingen</string>
   <string name="Type">Type</string>
@@ -46,7 +42,6 @@
   <string name="repeat">herhalen</string>
   <string name="time">tijd</string>
   <string name="distance">afstand</string>
-  <string name="Unknown">Onbekend</string>
   <string name="Distance">Afstand</string>
   <string name="speed">snelheid</string>
   <string name="pace">tempo</string>
@@ -81,8 +76,6 @@
   <string name="GPS_satellites">GPS satellieten</string>
   <string name="Start_GPS">Start GPS</string>
   <string name="Duration">Duur</string>
-  <string name="Duration_type">Duur soort</string>
-  <string name="Target_type">Doel type</string>
   <string name="Cancel">Afbreken</string>
   <string name="value">waarde</string>
   <string name="Select_all">Alles selecteren</string>
@@ -116,7 +109,7 @@
   <string name="Age">Leeftijd</string>
   <string name="edit">aanpassen</string>
   <string name="Synchronizing">Synchroniseren:</string>
-  <string name="synchronizing_feed">synchroniseren van de feed...</string>
+  <string name="synchronizing_feed">synchroniseren van de feed…</string>
   <string name="OK">OK</string>
   <string name="Table_format">Tabel formaat</string>
   <string name="Clear_uploads">Uploads wissen</string>
@@ -154,9 +147,9 @@
   <string name="Dismiss">Afwijzen</string>
   <string name="No_way">Absoluut niet</string>
   <string name="No">Nee</string>
-  <string name="Loading">Laden...</string>
+  <string name="Loading">Laden…</string>
   <string name="Saving">Opslaan</string>
-  <string name="Cancellingplease_wait">Annuleren...even geduld aub</string>
+  <string name="Cancellingplease_wait">Annuleren…even geduld aub</string>
   <string name="try_again_later">Probeer het later opnieuw!</string>
   <string name="Are_you_sure">Weet u het zeker?</string>
   <string name="Configure_audio_cues">Auditieve signalen instellen</string>
@@ -165,7 +158,6 @@
   <string name="Use_your_headset_to_startpauseresume_RunnerUp">Gebruik uw headset om RunnerUp te starten/pauzeren/hervatten</string>
   <string name="Convert_reststep_with_type_distance_to_recoverystep_for_Intervaltab">Omzetten rust-stap met type afstand tot herstel-stap voor Interval-tabblad</string>
   <string name="Convert_reststep_with_type_distance_to_recoverystep_for_Advancedtab">Omzetten rust-stap met type afstand tot herstel-stap voor Geavanceerde-tabblad</string>
-  <string name="mm31kz513sg5">mm(31);kz(5,13);sg(5)</string>
   <string name="Export_database_to_sdcard_eg_for_upgrade">Exporteer de database naar sdcard (bijv. voor een upgrade)</string>
   <string name="Import_database_from_sdcard_eg_after_upgrade">Importeer de database van sdcard (bijv. na een upgrade)</string>
   <string name="Coach_to_help_you_reach_target_if_having_set_target">Coach om u te helpen uw doel te bereiken (als u uw doel reeds heeft ingesteld)</string>
@@ -178,7 +170,7 @@
   <string name="Autolap">Automatische ronde</string>
   <string name="Autolap_m">Automatische ronde (m)</string>
   <string name="Autopause">Automatische pauze</string>
-  <string name="Enable_RunnerUpLive">Aanzetten RunnerUpLive</string>
+  <string name="Enable_RunnerUpLive">Aanzetten Live</string>
   <string name="Headset_key_startstop">Headset-toets start/stop</string>
   <string name="Activity_countdown">Aftellen activiteit</string>
   <string name="Countdown_time_s">Aftellen tijd (s)</string>
@@ -251,8 +243,8 @@
   <string name="Low_HRM_battery_level">Laag batterijniveau HRM </string>
   <string name="High_HRM_battery_level">Hoog batterijniveau HRM</string>
   <string name="Warning">Waarschuwing</string>
-  <string name="The_battery_level_of_your_heartrate_monitor_is_low">Het batterijniveau van uw hartslagmeter is laag.</string>
   <string name="Do_not_show_again">Niet meer laten zien</string>
-  <string name="Waiting_for_phone">Wachten op smartphone</string>
-  <string name="Saving_on_phone">Opslaan op smartphone</string>
+  <string name="Waiting_for_phone" tools:ignore="UnusedResources">Wachten op smartphone</string>
+  <string name="Saving_on_phone" tools:ignore="UnusedResources">Opslaan op smartphone</string>
+  <string name="Unknown">Onbekend</string>
 </resources>

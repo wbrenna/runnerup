@@ -28,10 +28,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -82,6 +84,7 @@ public class MainLayout extends TabActivity
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.main);
 
         int versionCode = 0;
@@ -118,6 +121,18 @@ public class MainLayout extends TabActivity
 
         Log.e(getClass().getName(), "app-version: " + versionCode + ", upgradeState: " + upgradeState
                 + ", km: " + km);
+
+        // convert pref_mute to pref_mute_bool
+        Resources res = getResources();
+        try {
+            if (pref.contains(res.getString(R.string.pref_mute))) {
+                String v = pref.getString(res.getString(R.string.pref_mute), "no");
+                editor.putBoolean(res.getString(R.string.pref_mute_bool), v.equalsIgnoreCase("yes"));
+                editor.remove(res.getString(R.string.pref_mute));
+                editor.commit();
+            }
+        } catch (Exception e) {
+        }
 
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         PreferenceManager.setDefaultValues(this, R.xml.audio_cue_settings, true);

@@ -25,6 +25,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Build;
@@ -42,6 +43,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.runnerup.R;
+import org.runnerup.BuildConfig;
 import org.runnerup.tracker.Tracker;
 import org.runnerup.tracker.component.TrackerHRM;
 import org.runnerup.util.Formatter;
@@ -103,6 +105,7 @@ public class RunActivity extends Activity implements TickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.run);
         formatter = new Formatter(this);
         hrZones = new HRZones(this);
@@ -314,7 +317,7 @@ public class RunActivity extends Activity implements TickListener {
                 // we were paused before stopButtonClick...don't resume
             }
         } else {
-            assert (false);
+            if (BuildConfig.DEBUG) { throw new AssertionError(); }
         }
     }
 

@@ -34,12 +34,14 @@ public class PersistentGpsLoggerListener extends LocationListenerBase implements
     private SQLiteDatabase mDB;
     private java.lang.String mTable;
     private ContentValues mKey;
+    private boolean mLogGpxAccuracy;
 
     public PersistentGpsLoggerListener(SQLiteDatabase _db, String _table,
-            ContentValues _key) {
+            ContentValues _key, boolean logGpxAccuracy) {
         this.mLock = new java.lang.Object();
         this.mDB = _db;
         this.mTable = _table;
+        this.mLogGpxAccuracy = logGpxAccuracy;
         setKey(_key);
     }
 
@@ -76,13 +78,8 @@ public class PersistentGpsLoggerListener extends LocationListenerBase implements
         }
     }
 
-    @Override
-    public void onLocationChanged(Location arg0) {
-        super.onLocationChanged(arg0);
-        onLocationChanged(arg0, null);
-    }
-
-    public void onLocationChanged(Location arg0, Integer hrValue) {
+    public void onLocationChanged(Location arg0, Double eleValue, Long elapsed, Double distance,
+        Integer hrValue, Float cadValue, Float temperatureValue, Float pressureValue) {
         ContentValues values;
         synchronized (mLock) {
             if (mKey == null)
@@ -92,26 +89,52 @@ public class PersistentGpsLoggerListener extends LocationListenerBase implements
         }
 
         values.put(DB.LOCATION.TIME, arg0.getTime());
-        values.put(DB.LOCATION.LATITUDE, (float) arg0.getLatitude());
-        values.put(DB.LOCATION.LONGITUDE, (float) arg0.getLongitude());
-        if (arg0.hasAltitude()) {
-            values.put(DB.LOCATION.ALTITUDE, (float) arg0.getAltitude());
+        values.put(DB.LOCATION.LATITUDE, arg0.getLatitude());
+        values.put(DB.LOCATION.LONGITUDE, arg0.getLongitude());
+        if (eleValue != null) {
+            values.put(DB.LOCATION.ALTITUDE, eleValue);
         }
-
-        //Accuracy related, normally not used in exports
-        //Most GPS chips also includes no of sats: arg0.getExtras().getInt("satellites", -1)
+        //Used by Google Fit, so logged by default
         if (arg0.hasAccuracy()) {
             values.put(DB.LOCATION.ACCURANCY, arg0.getAccuracy());
         }
-        if (arg0.hasSpeed()) {
-            values.put(DB.LOCATION.SPEED, arg0.getSpeed());
-        }
-        if (arg0.hasBearing()) {
-            values.put(DB.LOCATION.BEARING, arg0.getBearing());
-        }
 
+        if (this.mLogGpxAccuracy) {
+            //Accuracy related, normally not used in exports
+            //null data still uses one byte storage
+            if (arg0.hasAltitude()) {
+                values.put(DB.LOCATION.GPS_ALTITUDE, arg0.getAltitude());
+            }
+            if (arg0.hasSpeed()) {
+                values.put(DB.LOCATION.SPEED, arg0.getSpeed());
+            }
+            if (arg0.hasBearing()) {
+                values.put(DB.LOCATION.BEARING, arg0.getBearing());
+            }
+            //Most GPS chips also includes no of sats
+            int sats = arg0.getExtras().getInt("satellites", -1);
+            if (sats >= 0) {
+                values.put(DB.LOCATION.SATELLITES, sats);
+            }
+            //Not accuracy related but unused by exporters
+            if (pressureValue != null) {
+                values.put(DB.LOCATION.PRESSURE, pressureValue);
+            }
+        }
+        if (elapsed != null) {
+            values.put(DB.LOCATION.ELAPSED, elapsed);
+        }
+        if (distance != null) {
+            values.put(DB.LOCATION.DISTANCE, distance);
+        }
         if (hrValue != null) {
             values.put(DB.LOCATION.HR, hrValue);
+        }
+        if (cadValue != null) {
+            values.put(DB.LOCATION.CADENCE, cadValue);
+        }
+        if (temperatureValue != null) {
+            values.put(DB.LOCATION.TEMPERATURE, temperatureValue);
         }
         if (mDB != null) {
             mDB.insert(mTable, null, values);

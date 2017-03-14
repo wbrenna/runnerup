@@ -37,6 +37,7 @@ import org.runnerup.workout.feedback.AudioCountdownFeedback;
 import org.runnerup.workout.feedback.AudioFeedback;
 import org.runnerup.workout.feedback.CoachFeedback;
 import org.runnerup.workout.feedback.CountdownFeedback;
+import org.runnerup.workout.feedback.HRMStateChangeFeedback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,8 +94,8 @@ public class WorkoutBuilder {
             step.targetValue = range;
         } else if (target == Dimension.HRZ) {
             HRZones hrCalc = new HRZones(res, prefs);
-            int zone = prefs.getInt(res.getString(R.string.pref_basic_target_hrz), 0);
-            if (zone > 0) {
+            int zone = prefs.getInt(res.getString(R.string.pref_basic_target_hrz), -1);
+            if (zone >= 0) {
                 Pair<Integer, Integer> vals = hrCalc.getHRValues(zone + 1);
                 if (vals != null) {
                     step.targetType = Dimension.HR;
@@ -237,8 +238,8 @@ public class WorkoutBuilder {
     }
 
     public static void addAudioCuesToWorkout(Resources res, Workout w, SharedPreferences prefs) {
-        final String mute = prefs.getString(res.getString(R.string.pref_mute), "no");
-        w.setMute("yes".equalsIgnoreCase(mute));
+        final boolean mute = prefs.getBoolean(res.getString(R.string.pref_mute_bool), false);
+        w.setMute(mute);
         addAudioCuesToWorkout(res, w.steps, prefs);
     }
 
@@ -275,6 +276,12 @@ public class WorkoutBuilder {
             ev2.skipCounter = 1; // skip above
             ev2.triggerAction.add(new AudioFeedback(R.string.cue_lap_started));
             triggers.add(ev2);
+
+            if (prefs.getBoolean(res.getString(R.string.pref_cue_hrm_connection), false)) {
+                HRMStateTrigger hrmState = new HRMStateTrigger();
+                hrmState.triggerAction.add(new HRMStateChangeFeedback(hrmState));
+                triggers.add(hrmState);
+            }
         }
 
         Step stepArr[] = new Step[steps.size()];
