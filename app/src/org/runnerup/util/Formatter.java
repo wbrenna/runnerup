@@ -33,6 +33,9 @@ import org.runnerup.R;
 import org.runnerup.workout.Dimension;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 @TargetApi(Build.VERSION_CODES.FROYO)
@@ -282,6 +285,10 @@ public class Formatter implements OnSharedPreferenceChangeListener {
     private String cueElapsedTime(long seconds, boolean includeDimension) {
         long hours = 0;
         long minutes = 0;
+        boolean longDate = false;
+        if (seconds > 1490400000) {
+            longDate = true;
+        }
         if (seconds >= 3600) {
             hours = seconds / 3600;
             seconds -= hours * 3600;
@@ -311,6 +318,37 @@ public class Formatter implements OnSharedPreferenceChangeListener {
                 s.append(seconds);
             }
         }
+
+        //Hack to format the current time as a date
+        if (longDate) {
+            s.setLength(0);
+            s.append("time is ");
+            Calendar c = Calendar.getInstance();
+            hours = c.get(Calendar.HOUR_OF_DAY);
+            minutes = c.get(Calendar.MINUTE);
+            if (hours == 0) {
+                s.append("12:");
+                s.append(minutes);
+                s.append(" AM");
+            } else if (hours < 12) {
+                s.append(hours+":");
+                s.append(minutes);
+                s.append(" AM");
+            } else if (hours == 12) {
+                s.append("12:");
+                s.append(minutes);
+                s.append(" PM");
+            } else {
+                s.append(hours-12+":");
+                s.append(minutes);
+                s.append(" PM");
+            }
+
+            //s.append(" and ");
+            //s.append(c.get(Calendar.SECOND));
+            //s.append(" seconds");
+        }
+
         return s.toString();
     }
 

@@ -184,6 +184,12 @@
 		<CheckBoxPreference
 			android:defaultValue="false"
 			android:persistent="true"
+			android:key="@string/cueinfo_current_time"
+			android:title="@string/Current_time" />
+
+		<CheckBoxPreference
+			android:defaultValue="false"
+			android:persistent="true"
 			android:key="@string/cueinfo_current_hr"
 			android:title="@string/Current_heart_rate" />
 

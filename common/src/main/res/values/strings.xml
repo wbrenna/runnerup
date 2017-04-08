@@ -233,6 +233,7 @@
   <string name="Lap_heart_rate_zone">Lap heart rate zone</string>
   <string name="Current_pace">Current pace</string>
   <string name="Current_speed">Current speed</string>
+  <string name="Current_time">Current time</string>
   <string name="Current_heart_rate">Current heart rate</string>
   <string name="Current_heart_rate_zone">Current heart rate zone</string>
   <string name="Misc_cues">Misc cues</string>

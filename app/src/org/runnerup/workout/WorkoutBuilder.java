@@ -756,6 +756,9 @@ public class WorkoutBuilder {
         if (prefs.getBoolean(res.getString(R.string.cueinfo_current_hr), false)) {
             feedback.add(new AudioFeedback(Scope.CURRENT, Dimension.HR));
         }
+        if (prefs.getBoolean(res.getString(R.string.cueinfo_current_time), false)) {
+            feedback.add(new AudioFeedback(Scope.CURRENT, Dimension.TIME));
+        }
         if (prefs.getBoolean(res.getString(R.string.cueinfo_current_hrz), false)) {
             feedback.add(new AudioFeedback(Scope.CURRENT, Dimension.HRZ));
         }

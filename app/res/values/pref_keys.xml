@@ -64,6 +64,7 @@
 
     <string name="cueinfo_current_speed">cueinfo_current_speed</string>
     <string name="cueinfo_current_hr">cueinfo_current_hr</string>
+    <string name="cueinfo_current_time">cueinfo_current_time</string>
     <string name="cueinfo_current_hrz">cueinfo_current_hrz</string>
     <string name="cueinfo_current_pace">cueinfo_current_pace</string>
 
