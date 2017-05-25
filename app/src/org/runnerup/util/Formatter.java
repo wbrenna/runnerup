@@ -334,28 +334,28 @@ public class Formatter implements OnSharedPreferenceChangeListener {
 
             if (hours == 0) {
                 s.append("12:");
-                if(minutes < 10) {
+                if(minutes < 10 && minutes > 0) {
                     s.append("O");
                 }
                 s.append(minutes);
                 s.append(" AM");
             } else if (hours < 12) {
                 s.append(hours+":");
-                if(minutes < 10) {
+                if(minutes < 10 && minutes > 0) {
                     s.append("O");
                 }
                 s.append(minutes);
                 s.append(" AM");
             } else if (hours == 12) {
                 s.append("12:");
-                if(minutes < 10) {
+                if(minutes < 10 && minutes > 0) {
                     s.append("O");
                 }
                 s.append(minutes);
                 s.append(" PM");
             } else {
                 s.append(hours-12+":");
-                if(minutes < 10) {
+                if(minutes < 10 && minutes > 0) {
                     s.append("O");
                 }
                 s.append(minutes);
